@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>For Llyan</title>
     <style>
         /* --- Reset & Base Styles --- */
@@ -12,6 +12,17 @@
             box-sizing: border-box;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+            cursor: none; /* Hide default cursor for desktop */
+        }
+
+        /* Show default cursor on mobile/touch devices */
+        @media (hover: none) and (pointer: coarse) {
+            * {
+                cursor: auto;
+            }
+            .custom-cursor, .cursor-particle {
+                display: none !important;
+            }
         }
 
         body, html {
@@ -22,14 +33,14 @@
             color: white;
         }
 
-        /* --- Soft Pink Gradient Background --- */
+        /* --- Darker & Saturated Gradient Background --- */
         .background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(-45deg, #ffc3a0, #ffafbd, #ffdde1, #ee9ca7, #fad0c4);
+            background: linear-gradient(-45deg, #FF416C, #FF4B2B, #DA22FF, #9733EE);
             background-size: 400% 400%;
             animation: gradientMove 15s ease infinite;
             z-index: -1;
@@ -41,6 +52,40 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* --- Custom Cursor --- */
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: white;
+            /* Heart Shape using Mask */
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
+            mask-size: cover;
+            -webkit-mask-size: cover;
+            pointer-events: none;
+            z-index: 99999;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s;
+        }
+
+        .cursor-particle {
+            position: fixed;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.7);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            z-index: 99998;
+            transform: translate(-50%, -50%);
+            animation: particleFade 0.8s ease-out forwards;
+        }
+
+        @keyframes particleFade {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -100%) scale(0); }
+        }
+
         /* --- Parallax Container --- */
         .parallax-wrapper {
             position: absolute;
@@ -50,7 +95,6 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            /* Transition for smooth parallax movement */
             transition: transform 0.1s ease-out;
             will-change: transform;
         }
@@ -62,7 +106,6 @@
             max-width: 800px;
             opacity: 1; 
             transition: opacity 1s ease;
-            cursor: pointer; /* Indicates clickable */
         }
 
         .cinematic-text {
@@ -73,7 +116,7 @@
             filter: blur(10px);
             transform: scale(0.95);
             transition: opacity 1.5s ease, filter 1.5s ease, transform 1.5s ease;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
         .cinematic-text.visible {
@@ -85,20 +128,20 @@
         /* --- Question Card --- */
         #question-card {
             display: none;
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             padding: 3rem 2rem;
             border-radius: 30px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             text-align: center;
             flex-direction: column;
             align-items: center;
             gap: 1.5rem;
             animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 10;
-            position: relative; /* Ensure it stays above background */
+            position: relative;
         }
 
         @keyframes popIn {
@@ -108,20 +151,19 @@
 
         .question-text {
             font-size: 2rem;
-            font-weight: 900; /* EXTRA BOLD */
+            font-weight: 900;
             color: #fff;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
             margin-bottom: 0.5rem;
         }
 
-        /* Taunt Text Style */
         .taunt-text {
             font-size: 1.1rem;
             font-weight: 600;
             font-style: italic;
-            color: #fff;
+            color: #ffeaa7;
             text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            height: 1.5rem; /* Reserve height to prevent jumping */
+            height: 1.5rem;
             transition: opacity 0.3s ease;
         }
 
@@ -155,8 +197,8 @@
         /* Yes Button */
         .btn-yes {
             background: #fff;
-            color: #e73c7e;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            color: #d63031;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             position: absolute;
             top: 50%;
             left: 50%;
@@ -173,7 +215,7 @@
 
         /* No Button */
         .btn-no {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
             border: 1px solid rgba(255,255,255,0.5);
             position: absolute;
@@ -181,13 +223,12 @@
             left: 50%;
             margin-left: 20px; 
             margin-top: -25px; 
-            /* Transition for smooth movement */
             transition: top 0.3s ease, left 0.3s ease, background 0.3s, border 0.3s;
-            z-index: 9999; /* Ensure it floats above everything */
+            z-index: 9999;
         }
 
         .btn-no:hover {
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.4);
         }
 
         /* --- Success Message --- */
@@ -196,14 +237,13 @@
             text-align: center;
             animation: popIn 0.8s ease;
             z-index: 20;
-            cursor: default;
             position: absolute;
         }
 
         #success-message h1 {
             font-size: 3rem;
             margin-bottom: 20px;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         .heart-emoji {
@@ -224,7 +264,7 @@
             position: fixed;
             width: 100px;
             height: 100px;
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.4);
             clip-path: path('M50 88.9L43.5 82.9C19.2 60.7 3.3 46.1 3.3 28.3C3.3 13.7 14.8 2.2 29.4 2.2C37.7 2.2 45.6 6.1 50 12.3C54.4 6.1 62.3 2.2 70.6 2.2C85.2 2.2 96.7 13.7 96.7 28.3C96.7 46.1 80.8 60.7 56.5 82.9L50 88.9Z');
             pointer-events: none; 
             transform: translate(-50%, -50%) scale(0);
@@ -270,6 +310,9 @@
 
     <div class="background"></div>
 
+    <!-- Custom Cursor Element -->
+    <div class="custom-cursor" id="cursor"></div>
+
     <!-- Parallax Wrapper -->
     <div class="parallax-wrapper" id="parallax">
         <div id="intro-container">
@@ -292,25 +335,29 @@
 
     <script>
         const scriptLines = [
-            "Hi Llyan",
+            "Hi, Yan 😚",
+            "I was supposed to send this to you before our recent date",
+            "But I didn't finish coding this in time",
+            "So like, kever",
+            "Anyway...",
             "Even though we've only been for like almost 2 months",
             "It honestly feels like a year already",
             "I might have some lapses, and we might have some fights here and there",
             "But it didn't stop us from loving each other",
             "And of course, you still accepted me for who I am",
             "In fact, I could say it only made me love you even more",
-            "Anyway, with that being said"
+            "With that being said..."
         ];
 
         const tauntMessages = [
-            "Oh! You don't get to choose!",
-            "Nice try, keep running!",
-            "There's no escape, baby.",
-            "Just say yes already!",
-            "Why make this difficult?",
-            "You know you want to.",
-            "Give up!",
-            "No is not an answer."
+            "Waraef...",
+            "I-click ang yes oi...!!!",
+            "PAKYU",
+            "gng i'm crine 🥀",
+            "WHAT DO U MEAN UR GONNA CLICK NO ⁉️",
+            "You know you want to 😝",
+            "HOY PAG YES NA KUNO",
+            "No is not an answer..."
         ];
 
         const textDisplay = document.getElementById('text-display');
@@ -321,12 +368,91 @@
         const noBtn = document.getElementById('no-btn');
         const parallax = document.getElementById('parallax');
         const tauntText = document.getElementById('taunt-text');
+        const cursor = document.getElementById('cursor');
 
-        // --- 1. Click-to-Skip Logic Setup ---
-        let skipWait = () => {}; // Function to force skip
+        // --- 1. Custom Cursor Logic ---
+        let mouseX = 0;
+        let mouseY = 0;
+        let isMoving = false;
+        let particleInterval;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // Move cursor immediately
+            cursor.style.left = `${mouseX}px`;
+            cursor.style.top = `${mouseY}px`;
+
+            // Create particle trail
+            createParticle(mouseX, mouseY);
+        });
+
+        function createParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.classList.add('cursor-particle');
+            
+            // Add some randomness to particle position
+            const randomX = (Math.random() - 0.5) * 10;
+            const randomY = (Math.random() - 0.5) * 10;
+
+            particle.style.left = `${x + randomX}px`;
+            particle.style.top = `${y + randomY}px`;
+            
+            document.body.appendChild(particle);
+
+            // Remove particle after animation
+            setTimeout(() => {
+                particle.remove();
+            }, 800);
+        }
+
+        // --- 2. Gyroscope Parallax (Mobile) ---
+        function initGyro() {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                // iOS 13+ requires permission
+                DeviceOrientationEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            window.addEventListener('deviceorientation', handleOrientation);
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // Non-iOS or older devices
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+        }
+
+        function handleOrientation(event) {
+            const x = event.gamma; // -90 to 90 (left/right tilt)
+            const y = event.beta;  // -180 to 180 (front/back tilt)
+
+            // Dampen the effect and center it
+            // We divide by a larger number (e.g., 3 or 4) to make it subtle
+            const moveX = x / 3; 
+            const moveY = (y - 45) / 3; // -45 assumes user holds phone at roughly 45 degrees
+
+            parallax.style.transform = `translateX(${-moveX}px) translateY(${-moveY}px)`;
+        }
+
+        // Desktop Mouse Parallax
+        document.addEventListener('mousemove', (e) => {
+            // Check if user is on a device that likely supports hover (Desktop)
+            if (window.matchMedia("(hover: hover)").matches) {
+                const x = (window.innerWidth - e.pageX * 2) / 100;
+                const y = (window.innerHeight - e.pageY * 2) / 100;
+                parallax.style.transform = `translateX(${x}px) translateY(${y}px)`;
+            }
+        });
+
+        // --- 3. Click-to-Skip Logic & Gyro Init ---
+        let skipWait = () => {}; 
         
-        // When user clicks during intro, trigger the skip
         introContainer.addEventListener('click', () => {
+            // Init Gyroscope on first interaction
+            initGyro();
+            // Skip text
             skipWait();
         });
 
@@ -337,7 +463,6 @@
                 textDisplay.innerText = line;
                 textDisplay.classList.add('visible');
                 
-                // Custom wait: can be skipped by calling skipWait()
                 await new Promise(r => {
                     skipWait = r;
                     setTimeout(r, getDuration(line));
@@ -345,7 +470,6 @@
 
                 textDisplay.classList.remove('visible');
                 
-                // Wait for fade out, also skippable
                 await new Promise(r => {
                     skipWait = r;
                     setTimeout(r, 1500);
@@ -363,18 +487,9 @@
             questionCard.style.display = 'flex';
         }
 
-        // --- 2. Parallax Effect ---
-        document.addEventListener('mousemove', (e) => {
-            const x = (window.innerWidth - e.pageX * 2) / 100;
-            const y = (window.innerHeight - e.pageY * 2) / 100;
-            
-            // Apply subtle movement to the main container
-            parallax.style.transform = `translateX(${x}px) translateY(${y}px)`;
-        });
-
-        // --- 3. Heart Ripple Effect ---
+        // --- 4. Heart Ripple Effect ---
         document.addEventListener('click', (e) => {
-            // Don't ripple if clicking the success message
+            // Don't ripple if clicking success message
             if(successMessage.style.display === 'block') return;
 
             const heart = document.createElement('div');
@@ -388,50 +503,40 @@
             }, 800);
         });
 
-        // --- 4. Runaway Logic (Percentage Based + Fixed to Body) ---
+        // --- 5. Runaway Logic (Percentage Based + Mobile Touch) ---
         let escaped = false;
 
         function runAway() {
-            // 1. Handoff from Absolute to Fixed AND move to Body (One time)
             if (!escaped) {
                 noBtn.style.position = 'fixed';
-                noBtn.style.margin = '0'; // Remove centering margins
-                noBtn.style.transform = 'none'; // Remove CSS transforms
-                noBtn.style.zIndex = '9999'; // Ensure it's on top
+                noBtn.style.margin = '0';
+                noBtn.style.transform = 'none';
+                noBtn.style.zIndex = '9999';
                 
-                // CRITICAL FIX: Append to body so it is no longer constrained 
-                // by the card's flex container or overflow.
+                // Move to body to escape card constraints
                 document.body.appendChild(noBtn);
-                
                 escaped = true;
             }
 
-            // 2. Calculate button size as a percentage of screen
             const btnWidthPercent = (noBtn.offsetWidth / window.innerWidth) * 100;
             const btnHeightPercent = (noBtn.offsetHeight / window.innerHeight) * 100;
 
-            // 3. Define Safe Boundaries (Keep at least 5% away from edges)
             const minPadding = 5; 
             const maxPercentX = 100 - btnWidthPercent - minPadding;
             const maxPercentY = 100 - btnHeightPercent - minPadding;
 
-            // 4. Generate Random Percentage Coordinates
             const randomX = Math.random() * (maxPercentX - minPadding) + minPadding;
             const randomY = Math.random() * (maxPercentY - minPadding) + minPadding;
 
-            // 5. Apply Position (Using Percentages)
             noBtn.style.left = `${randomX}%`;
             noBtn.style.top = `${randomY}%`;
 
-            // 6. Update Taunt Text
             updateTaunt();
         }
 
         function updateTaunt() {
-            // Pick a random taunt
             const randomTaunt = tauntMessages[Math.floor(Math.random() * tauntMessages.length)];
             
-            // Simple animation for text change
             tauntText.style.opacity = '0';
             setTimeout(() => {
                 tauntText.innerText = randomTaunt;
@@ -439,19 +544,23 @@
             }, 300);
         }
 
-        // Event Listeners for running away
+        // Mouse Hover
         noBtn.addEventListener('mouseenter', runAway);
+        
+        // Mouse Click
         noBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             runAway();
         });
+        
+        // Mobile Touch (Crucial for mobile support)
         noBtn.addEventListener('touchstart', (e) => {
             e.stopPropagation();
-            e.preventDefault(); // Prevent scrolling on touch
+            e.preventDefault(); // Prevents scrolling if tapping the button
             runAway();
         });
 
-        // --- 5. Success Logic ---
+        // --- 6. Success Logic ---
         yesBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             questionCard.style.display = 'none';
@@ -460,7 +569,7 @@
             createConfetti();
         });
 
-        // --- 6. Confetti ---
+        // --- 7. Confetti ---
         function createConfetti() {
             const colors = ['#ff9a9e', '#fad0c4', '#ffecd2', '#fcb69f', '#ffffff'];
             
