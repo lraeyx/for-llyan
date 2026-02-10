@@ -326,4 +326,175 @@
         let skipWait = () => {}; // Function to force skip
         
         // When user clicks during intro, trigger the skip
-        introContainer.addEventListener('click',
+        introContainer.addEventListener('click', () => {
+            skipWait();
+        });
+
+        async function playIntro() {
+            const getDuration = (text) => Math.max(2000, text.length * 80);
+
+            for (let line of scriptLines) {
+                textDisplay.innerText = line;
+                textDisplay.classList.add('visible');
+                
+                // Custom wait: can be skipped by calling skipWait()
+                await new Promise(r => {
+                    skipWait = r;
+                    setTimeout(r, getDuration(line));
+                });
+
+                textDisplay.classList.remove('visible');
+                
+                // Wait for fade out, also skippable
+                await new Promise(r => {
+                    skipWait = r;
+                    setTimeout(r, 1500);
+                });
+            }
+
+            introContainer.style.opacity = '0';
+            setTimeout(() => {
+                introContainer.style.display = 'none';
+                showQuestion();
+            }, 1000);
+        }
+
+        function showQuestion() {
+            questionCard.style.display = 'flex';
+        }
+
+        // --- 2. Parallax Effect ---
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth - e.pageX * 2) / 100;
+            const y = (window.innerHeight - e.pageY * 2) / 100;
+            
+            // Apply subtle movement to the main container
+            parallax.style.transform = `translateX(${x}px) translateY(${y}px)`;
+        });
+
+        // --- 3. Heart Ripple Effect ---
+        document.addEventListener('click', (e) => {
+            // Don't ripple if clicking the success message
+            if(successMessage.style.display === 'block') return;
+
+            const heart = document.createElement('div');
+            heart.classList.add('heart-ripple');
+            heart.style.left = `${e.clientX}px`;
+            heart.style.top = `${e.clientY}px`;
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 800);
+        });
+
+        // --- 4. Runaway Logic (Percentage Based + Fixed to Body) ---
+        let escaped = false;
+
+        function runAway() {
+            // 1. Handoff from Absolute to Fixed AND move to Body (One time)
+            if (!escaped) {
+                noBtn.style.position = 'fixed';
+                noBtn.style.margin = '0'; // Remove centering margins
+                noBtn.style.transform = 'none'; // Remove CSS transforms
+                noBtn.style.zIndex = '9999'; // Ensure it's on top
+                
+                // CRITICAL FIX: Append to body so it is no longer constrained 
+                // by the card's flex container or overflow.
+                document.body.appendChild(noBtn);
+                
+                escaped = true;
+            }
+
+            // 2. Calculate button size as a percentage of screen
+            const btnWidthPercent = (noBtn.offsetWidth / window.innerWidth) * 100;
+            const btnHeightPercent = (noBtn.offsetHeight / window.innerHeight) * 100;
+
+            // 3. Define Safe Boundaries (Keep at least 5% away from edges)
+            const minPadding = 5; 
+            const maxPercentX = 100 - btnWidthPercent - minPadding;
+            const maxPercentY = 100 - btnHeightPercent - minPadding;
+
+            // 4. Generate Random Percentage Coordinates
+            const randomX = Math.random() * (maxPercentX - minPadding) + minPadding;
+            const randomY = Math.random() * (maxPercentY - minPadding) + minPadding;
+
+            // 5. Apply Position (Using Percentages)
+            noBtn.style.left = `${randomX}%`;
+            noBtn.style.top = `${randomY}%`;
+
+            // 6. Update Taunt Text
+            updateTaunt();
+        }
+
+        function updateTaunt() {
+            // Pick a random taunt
+            const randomTaunt = tauntMessages[Math.floor(Math.random() * tauntMessages.length)];
+            
+            // Simple animation for text change
+            tauntText.style.opacity = '0';
+            setTimeout(() => {
+                tauntText.innerText = randomTaunt;
+                tauntText.style.opacity = '1';
+            }, 300);
+        }
+
+        // Event Listeners for running away
+        noBtn.addEventListener('mouseenter', runAway);
+        noBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            runAway();
+        });
+        noBtn.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+            e.preventDefault(); // Prevent scrolling on touch
+            runAway();
+        });
+
+        // --- 5. Success Logic ---
+        yesBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            questionCard.style.display = 'none';
+            noBtn.style.display = 'none';
+            successMessage.style.display = 'block';
+            createConfetti();
+        });
+
+        // --- 6. Confetti ---
+        function createConfetti() {
+            const colors = ['#ff9a9e', '#fad0c4', '#ffecd2', '#fcb69f', '#ffffff'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.left = '50%';
+                confetti.style.top = '50%';
+                const size = Math.random() * 10 + 5;
+                confetti.style.width = size + 'px';
+                confetti.style.height = size + 'px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.borderRadius = '50%';
+                confetti.style.zIndex = '100';
+                document.body.appendChild(confetti);
+
+                const destX = (Math.random() - 0.5) * window.innerWidth;
+                const destY = (Math.random() - 0.5) * window.innerHeight;
+                const rotate = Math.random() * 720;
+
+                confetti.animate([
+                    { transform: `translate(0,0) rotate(0deg)`, opacity: 1 },
+                    { transform: `translate(${destX}px, ${destY}px) rotate(${rotate}deg)`, opacity: 0 }
+                ], {
+                    duration: 2000 + Math.random() * 1000,
+                    easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+                    fill: 'forwards'
+                }).onfinish = () => confetti.remove();
+            }
+        }
+
+        // Start
+        window.onload = playIntro;
+
+    </script>
+</body>
+</html>
