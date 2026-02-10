@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Llyan</title>
+    <style>
+        /* --- Reset & Base Styles --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: white;
+        }
+
+        /* --- Soft Pink Gradient Background --- */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(-45deg, #ffc3a0, #ffafbd, #ffdde1, #ee9ca7, #fad0c4);
+            background-size: 400% 400%;
+            animation: gradientMove 15s ease infinite;
+            z-index: -1;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- Parallax Container --- */
+        .parallax-wrapper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            /* Transition for smooth parallax movement */
+            transition: transform 0.1s ease-out;
+            will-change: transform;
+        }
+
+        /* --- Cinematic Text Section --- */
+        #intro-container {
+            text-align: center;
+            padding: 20px;
+            max-width: 800px;
+            opacity: 1; 
+            transition: opacity 1s ease;
+            cursor: pointer; /* Indicates clickable */
+        }
+
+        .cinematic-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.4;
+            opacity: 0;
+            filter: blur(10px);
+            transform: scale(0.95);
+            transition: opacity 1.5s ease, filter 1.5s ease, transform 1.5s ease;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .cinematic-text.visible {
+            opacity: 1;
+            filter: blur(0);
+            transform: scale(1);
+        }
+
+        /* --- Question Card --- */
+        #question-card {
+            display: none;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 3rem 2rem;
+            border-radius: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            text-align: center;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+            position: relative; /* Ensure it stays above background */
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .question-text {
+            font-size: 2rem;
+            font-weight: 900; /* EXTRA BOLD */
+            color: #fff;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Taunt Text Style */
+        .taunt-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-style: italic;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            height: 1.5rem; /* Reserve height to prevent jumping */
+            transition: opacity 0.3s ease;
+        }
+
+        /* --- Button Layout System --- */
+        .buttons-container {
+            position: relative; 
+            width: 350px; 
+            height: 60px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 35px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            min-width: 100px;
+            height: 50px; 
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            white-space: nowrap;
+        }
+
+        /* Yes Button */
+        .btn-yes {
+            background: #fff;
+            color: #e73c7e;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -80px; 
+            margin-top: -25px; 
+            transform: translate(-20px, 0); 
+            transition: transform 0.2s, background 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-yes:hover {
+            transform: translate(-20px, 0) scale(1.1);
+            background: #fdfdfd;
+        }
+
+        /* No Button */
+        .btn-no {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.5);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: 20px; 
+            margin-top: -25px; 
+            /* Transition for smooth movement */
+            transition: top 0.3s ease, left 0.3s ease, background 0.3s, border 0.3s;
+            z-index: 9999; /* Ensure it floats above everything */
+        }
+
+        .btn-no:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* --- Success Message --- */
+        #success-message {
+            display: none;
+            text-align: center;
+            animation: popIn 0.8s ease;
+            z-index: 20;
+            cursor: default;
+            position: absolute;
+        }
+
+        #success-message h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .heart-emoji {
+            display: inline-block;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- Heart Ripple Effect --- */
+        .heart-ripple {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.6);
+            clip-path: path('M50 88.9L43.5 82.9C19.2 60.7 3.3 46.1 3.3 28.3C3.3 13.7 14.8 2.2 29.4 2.2C37.7 2.2 45.6 6.1 50 12.3C54.4 6.1 62.3 2.2 70.6 2.2C85.2 2.2 96.7 13.7 96.7 28.3C96.7 46.1 80.8 60.7 56.5 82.9L50 88.9Z');
+            pointer-events: none; 
+            transform: translate(-50%, -50%) scale(0);
+            animation: rippleAnim 0.8s ease-out forwards;
+            z-index: 9999;
+        }
+
+        @keyframes rippleAnim {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(15); opacity: 0; }
+        }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 600px) {
+            .cinematic-text { font-size: 1.8rem; }
+            #question-card { width: 90%; padding: 2rem; }
+            .question-text { font-size: 1.5rem; }
+            
+            .buttons-container {
+                width: 200px;
+                height: 120px;
+            }
+            .btn-yes {
+                top: 0;
+                left: 50%;
+                margin-left: -60px; 
+                margin-top: 0;
+                transform: none;
+            }
+            .btn-yes:hover { transform: scale(1.1); }
+            
+            .btn-no {
+                top: auto;
+                bottom: 0;
+                left: 50%;
+                margin-left: -60px; 
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background"></div>
+
+    <!-- Parallax Wrapper -->
+    <div class="parallax-wrapper" id="parallax">
+        <div id="intro-container">
+            <h1 id="text-display" class="cinematic-text"></h1>
+        </div>
+
+        <section id="question-card">
+            <div class="question-text">Will you be my valentine? 💗</div>
+            <div class="taunt-text" id="taunt-text"></div>
+            <div class="buttons-container">
+                <button class="btn btn-yes" id="yes-btn">Yes</button>
+                <button class="btn btn-no" id="no-btn">No</button>
+            </div>
+        </section>
+
+        <div id="success-message">
+            <h1>Yippee, I love you so much baby! <span class="heart-emoji">❤️</span></h1>
+        </div>
+    </div>
+
+    <script>
+        const scriptLines = [
+            "Hi Llyan",
+            "Even though we've only been for like almost 2 months",
+            "It honestly feels like a year already",
+            "I might have some lapses, and we might have some fights here and there",
+            "But it didn't stop us from loving each other",
+            "And of course, you still accepted me for who I am",
+            "In fact, I could say it only made me love you even more",
+            "Anyway, with that being said"
+        ];
+
+        const tauntMessages = [
+            "Oh! You don't get to choose!",
+            "Nice try, keep running!",
+            "There's no escape, baby.",
+            "Just say yes already!",
+            "Why make this difficult?",
+            "You know you want to.",
+            "Give up!",
+            "No is not an answer."
+        ];
+
+        const textDisplay = document.getElementById('text-display');
+        const introContainer = document.getElementById('intro-container');
+        const questionCard = document.getElementById('question-card');
+        const successMessage = document.getElementById('success-message');
+        const yesBtn = document.getElementById('yes-btn');
+        const noBtn = document.getElementById('no-btn');
+        const parallax = document.getElementById('parallax');
+        const tauntText = document.getElementById('taunt-text');
+
+        // --- 1. Click-to-Skip Logic Setup ---
+        let skipWait = () => {}; // Function to force skip
+        
+        // When user clicks during intro, trigger the skip
+        introContainer.addEventListener('click',
